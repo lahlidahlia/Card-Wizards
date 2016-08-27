@@ -5,11 +5,11 @@ public class Player : MonoBehaviour {
 
     public float speed;
     private Vector2 targetPosition;
-    
-    
+    private FireBlastSpell spell;
+    private GM gm;
 	// Use this for initialization
 	void Start () {
-        
+        gm = GameObject.Find("GM").GetComponent<GM>();
 	}
 	
 	// Update is called once per frame
@@ -20,6 +20,9 @@ public class Player : MonoBehaviour {
         // Right click to move.
         if(Input.GetMouseButton(1)){
             targetPosition = new Vector2(mouseX, mouseY);
+        }
+        if (Input.GetKey("1")) {
+            gm.spellDictionary[1].effect(gameObject);
         }
         lookAtMouse();
         moveToward(targetPosition, speed);
