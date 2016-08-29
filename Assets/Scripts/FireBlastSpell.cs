@@ -10,23 +10,16 @@ public class FireBlastSpell : Spell {
     }
 
     public FireBlastSpell(GM gm) : base(gm) {
-
+        getAsset("FireBlastSpell");  // Find the assets placed on this object.
     }
 
     public override void effect(GameObject player){
-        GameObject[] list = gm.gameObjectList;
-        GameObject spell = null;
-        foreach (GameObject gameObject in list) {
-            if (gameObject.name == "FireBlastSpell") {
-                spell = gameObject;
-                break;
-            }
-        }
-        if (spell == null) {
+        GameObject projectile = assets[0];
+        if (projectile == null) {
             Debug.Log("NOTHING HAPPENED");
             return;
         }
-        Object.Instantiate(spell, player.transform.position, player.transform.rotation);
+        Object.Instantiate(projectile, player.transform.position, player.transform.rotation);
     }
 
 
