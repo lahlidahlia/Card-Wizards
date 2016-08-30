@@ -4,12 +4,13 @@ using System.Collections.Generic;
 
 public class GM : MonoBehaviour {
     public GameObject[] gameObjectList;
-    public Dictionary<int, Spell> spellDictionary = new Dictionary<int, Spell>();
-	// Use this for initialization
-	void Start () {
-        Spell tempSpell = new FireBlastSpell(this);
-        spellDictionary.Add(tempSpell.ID, tempSpell);
-        
+    public Dictionary<int, Spell> spellDictionary;
+    // Use this for initialization
+    void Start () {
+        spellDictionary = new Dictionary<int, Spell>() {
+            {1, new FireBlastSpell(this) {ID = 1} },
+            {2, new ConeOfColdSpell(this) {ID = 2} },
+        };
 	}
 	
 	// Update is called once per frame

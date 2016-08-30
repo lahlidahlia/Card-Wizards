@@ -24,6 +24,9 @@ public class Player : MonoBehaviour {
         if (Input.GetKey("1")) {
             gm.spellDictionary[1].effect(gameObject);
         }
+        if (Input.GetKey("2")) {
+            gm.spellDictionary[2].effect(gameObject);
+        }
         lookAtMouse();
         moveToward(targetPosition, speed);
 	}

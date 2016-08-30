@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public abstract class Spell{
     public abstract int cooldown { get; }  // Cooldown of spell in seconds
-    public abstract int ID { get; }
+    public int ID { get; set; }
 
     public abstract void effect(GameObject player);
 
