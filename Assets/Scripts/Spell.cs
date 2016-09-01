@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 public abstract class Spell{
-    public abstract int cooldown { get; }  // Cooldown of spell in seconds
+    public abstract int cooldown { get; }  // Cooldown of spell in seconds.
+    public virtual bool isChannel { get { return false; } }  // Whether the spell is a channel spell.
     public int ID { get; set; }
 
     public abstract void effect(GameObject player);

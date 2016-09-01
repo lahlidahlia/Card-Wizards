@@ -7,6 +7,8 @@ public class Player : MonoBehaviour {
     private Vector2 targetPosition;
     private FireBlastSpell spell;
     private GM gm;
+    [System.NonSerialized]
+    public bool isChanneling = false;
 	// Use this for initialization
 	void Start () {
         gm = GameObject.Find("GM").GetComponent<GM>();
@@ -21,14 +23,30 @@ public class Player : MonoBehaviour {
         if(Input.GetMouseButton(1)){
             targetPosition = new Vector2(mouseX, mouseY);
         }
+        int inputKey = 0;
         if (Input.GetKey("1")) {
-            gm.spellDictionary[1].effect(gameObject);
+            inputKey = 1;
         }
-        if (Input.GetKey("2")) {
-            gm.spellDictionary[2].effect(gameObject);
+        else if (Input.GetKey("2")) {
+            inputKey = 2;
         }
-        lookAtMouse();
-        moveToward(targetPosition, speed);
+        if (inputKey != 0) {  // When a spell key is being pressed.
+            Spell spell = gm.spellDictionary[inputKey];  // Get the spell being casted.
+            if (!isChanneling) {
+                spell.effect(gameObject);  // Run the spell's effect if the player isn't already channeling something.
+            }
+        } else {  // When no key is pressed.
+            if (isChanneling == true) {  // When the player release key while channeling:
+                isChanneling = false;
+            }
+        }
+        Debug.Log(isChanneling);
+
+        if (!isChanneling) {
+            lookAtMouse();
+            moveToward(targetPosition, speed);
+        }
+        
 	}
     
     void lookAtMouse(){

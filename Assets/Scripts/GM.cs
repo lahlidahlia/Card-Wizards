@@ -13,6 +13,10 @@ public class GM : MonoBehaviour {
         };
 	}
 	
+    public Coroutine RunCoroutine(IEnumerator coroutine) {
+        /* Because you can't run a coroutine from a non-monobehaviour script apparently*/
+        return StartCoroutine(coroutine);
+    }
 	// Update is called once per frame
 	void Update () {
 	
