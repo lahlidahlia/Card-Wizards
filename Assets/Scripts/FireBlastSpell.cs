@@ -21,12 +21,16 @@ public class FireBlastSpell : Spell {
         }
         // Create the projectile.
         GameObject projectile = Object.Instantiate(projectilePrefab, player.transform.position, player.transform.rotation) as GameObject;
+        projectile.AddComponent<FireBlastProjectile>();
         // Setting the projectile damage.
-        projectile.GetComponent<ProjectileScript>().damage = damage;
+        projectile.GetComponent<FireBlastProjectile>().damage = damage;
         // Move the projectile.
         Rigidbody2D projectileRigidbody = projectile.GetComponent<Rigidbody2D>();
         projectileRigidbody.AddForce(projectile.transform.right*projectileSpeed);
     }
 
+    public class FireBlastProjectile : Projectile {
+
+    }
 
 }

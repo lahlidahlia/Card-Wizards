@@ -6,6 +6,9 @@ public class GM : MonoBehaviour {
     public GameObject[] gameObjectList;
     public Dictionary<int, Spell> spellDictionary;
     // Use this for initialization
+    void Awake() {
+
+    }
     void Start () {
         spellDictionary = new Dictionary<int, Spell>() {
             {1, new FireBlastSpell(this) {ID = 1} },

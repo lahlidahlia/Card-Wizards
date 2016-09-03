@@ -9,8 +9,6 @@ public class ConeOfColdSpell : Spell {
         getAsset("ConeOfColdSpell");  // Find the assets placed on this object.
     }
 
-    private float damage = 0.5f;
-
     public override void effect(GameObject player) {
         GameObject projectilePrefab = assets[0];
         if (projectilePrefab == null) {
@@ -18,16 +16,31 @@ public class ConeOfColdSpell : Spell {
             return;
         }
         GameObject projectile = Object.Instantiate(projectilePrefab, player.transform.position, player.transform.rotation) as GameObject;
+        projectile.AddComponent<ConeOfColdProjectile>();
+
         Player playerScr = player.GetComponent<Player>();
         playerScr.isChanneling = true;
+
+        // Run the channeling effect.
         gm.RunCoroutine(channel(playerScr, projectile));
     }
 
     public IEnumerator channel(Player playerScr, GameObject projectile) {
         while(playerScr.isChanneling) {
-            Debug.Log("CHANNELING!!!");
             yield return null;
         }
         Object.Destroy(projectile);
+    }
+
+    class ConeOfColdProjectile : PersistentProjectile {
+        protected override float damage {
+            get {
+                return 0.1f;  // Damage per second.
+            }
+
+            set {
+                base.damage = value;
+            }
+        }
     }
 }

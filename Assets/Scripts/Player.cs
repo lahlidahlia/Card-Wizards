@@ -40,7 +40,6 @@ public class Player : MonoBehaviour {
                 isChanneling = false;
             }
         }
-        Debug.Log(isChanneling);
 
         if (!isChanneling) {
             lookAtMouse();
