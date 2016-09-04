@@ -3,10 +3,13 @@ using System.Collections;
 
 public abstract class PersistentProjectile: MonoBehaviour {
     /* 
-     * This script applies to every persistent projectiles and values will be
+     * This script applies to most persistent projectiles and values will be
      *  set when the projectile is created by their respective spell scripts.
      *  
-     *  The projectile will be destroyed by the respective spell script.
+     * The key difference between a persistent projectile and a normal projectile
+     *  is that persistent projectiles won't be destroyed when collided with an enemy.
+     *  
+     * The projectile will be destroyed by the respective spell script.
      */
 
     protected virtual float damage { get; set; }  // Damage per second.

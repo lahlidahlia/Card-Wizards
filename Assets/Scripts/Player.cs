@@ -23,17 +23,19 @@ public class Player : MonoBehaviour {
         if(Input.GetMouseButton(1)){
             targetPosition = new Vector2(mouseX, mouseY);
         }
+        // Each key correspond to each hand slot.
         int inputKey = 0;
         if (Input.GetKey("1")) {
             inputKey = 1;
-        }
-        else if (Input.GetKey("2")) {
+        } else if (Input.GetKey("2")) {
             inputKey = 2;
+        } else if (Input.GetKey("3")) {
+            inputKey = 3;
         }
         if (inputKey != 0) {  // When a spell key is being pressed.
             Spell spell = gm.spellDictionary[inputKey];  // Get the spell being casted.
-            if (!isChanneling) {
-                spell.effect(gameObject);  // Run the spell's effect if the player isn't already channeling something.
+            if (!isChanneling) {  // Prevent player from casting again if player is channeling.
+                spell.effect(gameObject);
             }
         } else {  // When no key is pressed.
             if (isChanneling == true) {  // When the player release key while channeling:

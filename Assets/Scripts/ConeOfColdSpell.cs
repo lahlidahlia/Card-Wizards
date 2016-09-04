@@ -15,6 +15,7 @@ public class ConeOfColdSpell : Spell {
             Debug.Log("NOTHING HAPPENED");
             return;
         }
+
         GameObject projectile = Object.Instantiate(projectilePrefab, player.transform.position, player.transform.rotation) as GameObject;
         projectile.AddComponent<ConeOfColdProjectile>();
 

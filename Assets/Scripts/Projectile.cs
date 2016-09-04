@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class Projectile : MonoBehaviour {
     /* 
-     * This script will be inherited by every non-persistent projectiles and values will be
+     * This script will be inherited by most non-persistent projectiles and values will be
      *  set when the projectile is created by their respective spell scripts.
      *  
      * Each spell class should have their own nested class that defines their projectile script and

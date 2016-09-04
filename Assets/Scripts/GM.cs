@@ -13,6 +13,7 @@ public class GM : MonoBehaviour {
         spellDictionary = new Dictionary<int, Spell>() {
             {1, new FireBlastSpell(this) {ID = 1} },
             {2, new ConeOfColdSpell(this) {ID = 2} },
+            {3, new EarthDriveSpell(this) {ID = 3} },
         };
 	}
 	
