@@ -1,17 +1,27 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
     public float speed;
     private Vector2 targetPosition;
     private FireBlastSpell spell;
-    private GM gm;
     [System.NonSerialized]
     public bool isChanneling = false;
+
+    private Deck deck;
+	private Hand hand;
+
+	public Text handText;
+	public Text deckText;
 	// Use this for initialization
 	void Start () {
-        gm = GameObject.Find("GM").GetComponent<GM>();
+        deck = new Deck(new List<int>() { 1,1,1,2,2,2,3,3,3,3 });
+		deck.Shuffle();
+		hand = new Hand(deck);
+		while (hand.Draw()) { }  // Draw until hand is full.
 	}
 	
 	// Update is called once per frame
@@ -19,23 +29,32 @@ public class Player : MonoBehaviour {
         // Get mouse coordinate.
         float mouseX = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
         float mouseY = Camera.main.ScreenToWorldPoint(Input.mousePosition).y;
-        // Right click to move.
-        if(Input.GetMouseButton(1)){
+
+        if (Input.GetMouseButton(0)) {  // Left click.
+            Debug.Log(deck.ToString());
+        }
+        if (Input.GetMouseButton(1)) {  // Right click to move.
             targetPosition = new Vector2(mouseX, mouseY);
         }
+
         // Each key correspond to each hand slot.
-        int inputKey = 0;
-        if (Input.GetKey("1")) {
+        int inputKey = 0;  // 0 is no press.
+        if (Input.GetKeyDown("1")) {
             inputKey = 1;
-        } else if (Input.GetKey("2")) {
+        } else if (Input.GetKeyDown("2")) {
             inputKey = 2;
-        } else if (Input.GetKey("3")) {
+        } else if (Input.GetKeyDown("3")) {
             inputKey = 3;
+        } else if (Input.GetKeyDown("4")) {
+            inputKey = 4;
         }
-        if (inputKey != 0) {  // When a spell key is being pressed.
-            Spell spell = gm.spellDictionary[inputKey];  // Get the spell being casted.
+        if (inputKey == 5) {
+			Debug.Log(deck.ToString());
+        }
+        if (inputKey != 0 && inputKey != 5) {  // When a spell key is being pressed.
             if (!isChanneling) {  // Prevent player from casting again if player is channeling.
-                spell.effect(gameObject);
+				hand.Use(inputKey - 1, gameObject);
+				hand.Draw();
             }
         } else {  // When no key is pressed.
             if (isChanneling == true) {  // When the player release key while channeling:
@@ -47,7 +66,10 @@ public class Player : MonoBehaviour {
             lookAtMouse();
             moveToward(targetPosition, speed);
         }
-        
+
+		// Draw hand.
+		handText.text = hand.ToString();
+		deckText.text = deck.ToString();
 	}
     
     void lookAtMouse(){

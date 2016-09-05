@@ -15,7 +15,6 @@ public abstract class PersistentProjectile: MonoBehaviour {
     protected virtual float damage { get; set; }  // Damage per second.
 
     protected virtual IEnumerator OnTriggerStay2D(Collider2D col) {
-        Debug.Log("TRIGGERED");
         if (col.tag == "Enemy") {
             Enemy enemyScript = col.GetComponent<Enemy>();
             enemyScript.health -= damage/60f;

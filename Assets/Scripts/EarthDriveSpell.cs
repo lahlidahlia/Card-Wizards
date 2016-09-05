@@ -36,7 +36,6 @@ public class EarthDriveSpell : Spell {
             lastProjectile = projectile;
             float angleRadians = direction.eulerAngles.z * Mathf.Deg2Rad;  // Convert the direction to radians. Also a shortened variable.
             position = position + new Vector2(Mathf.Cos(angleRadians), Mathf.Sin(angleRadians)).normalized * distanceBetweenEachProjectile;
-            Debug.Log(direction.eulerAngles.z);
             yield return new WaitForSeconds(spawnDelay);
         }
     }
