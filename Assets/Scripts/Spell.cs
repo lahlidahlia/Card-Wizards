@@ -14,9 +14,7 @@ public abstract class Spell{
 
     public Spell(GM gm) {
         this.gm = gm;
-
-        Debug.Log("Constructed");
-    }
+	}
 
     protected void getAsset(string name) {
         /*

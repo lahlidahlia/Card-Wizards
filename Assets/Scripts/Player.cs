@@ -41,28 +41,41 @@ public class Player : MonoBehaviour {
         }
 
         // Each key correspond to each hand slot.
-        int inputKey = 0;  // 0 is no press.
-        if (Input.GetKeyDown("1")) {
-            inputKey = 1;
-        } else if (Input.GetKeyDown("2")) {
-            inputKey = 2;
-        } else if (Input.GetKeyDown("3")) {
-            inputKey = 3;
-        } else if (Input.GetKeyDown("4")) {
-            inputKey = 4;
-        }
-        if (inputKey == 5) {
-			Debug.Log(deck.ToString());
-        }
-        if (inputKey != 0 && inputKey != 5) {  // When a spell key is being pressed.
+        int inputKey = -1;  // -1 is no press.
+		int heldKey = -1;  // Used for channeling purposes.
+		// The reason getkeydown is nested within getkey is so that key press and key hold is differentiated.
+        if (Input.GetKey("1")) {
+			heldKey = 1;
+			if (Input.GetKeyDown("1")) {
+				inputKey = 1;
+			}
+        } else if (Input.GetKey("2")) {
+			heldKey = 2;
+			if (Input.GetKeyDown("2")) {
+				inputKey = 2;
+			}
+		} else if (Input.GetKey("3")) {
+			heldKey = 3;
+			if (Input.GetKeyDown("3")) {
+				inputKey = 3;
+			}
+		} else if (Input.GetKey("4")) {
+			heldKey = 4;
+			if (Input.GetKeyDown("4")) {
+				inputKey = 4;
+			}
+		}
+        if (inputKey != -1) {  // When a spell key is being pressed.
 			// Cast a spell if not channeling and not on cooldown.
             if (!isChanneling && cooldownTimer.GetState()) {
 				Spell spellUsed = hand.Use(inputKey - 1, gameObject);
 				cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
 				hand.Draw();
             }
-        } else {  // When no key is pressed.
+        } 
+		if(heldKey == -1){  // When no key is held.
             if (isChanneling == true) {  // When the player release key while channeling:
+				Debug.Log("UNCHANNELING!");
                 isChanneling = false;
             }
         }
