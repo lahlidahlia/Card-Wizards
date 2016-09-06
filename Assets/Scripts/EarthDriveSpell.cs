@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class EarthDriveSpell : Spell {
-    public override int cooldown { get { return 2; } }
+    public override float cooldown { get { return 1; } }
     public override bool isChannel { get { return true; } }
 
     private float spawnDelay = 0.5f;  // Delay between each projectile spawn.

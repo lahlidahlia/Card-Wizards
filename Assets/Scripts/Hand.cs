@@ -27,15 +27,16 @@ public class Hand {
 		return false;  // Hand is full.
     }
 
-	public void Use(int index, GameObject player) {
-		/* Use the card at the given index. */
+	public Spell Use(int index, GameObject player) {
+		/* Use the card at the given index. Returns the spell used. */
 		int card = hand[index];
 		if (card == -1) {  // If the hand slot is empty.
-			return;
+			return null;
 		}
 		GM.spellDictionary[card].effect(player);
 		deck.AddToDiscard(card);  // Add to discard pile to be reshuffled.
 		hand[index] = -1;  // Remove the card from hand.		
+		return GM.spellDictionary[card];  // Return the spell used.
 	}
 
 	public override string ToString() {

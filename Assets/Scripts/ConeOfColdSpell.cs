@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class ConeOfColdSpell : Spell {
-    public override int cooldown { get { return 2; } }
+    public override float cooldown { get { return 2; } }
     public override bool isChannel { get { return true; } }
 
     public ConeOfColdSpell(GM gm) : base(gm) {

@@ -7,7 +7,6 @@ public class Player : MonoBehaviour {
 
     public float speed;
     private Vector2 targetPosition;
-    private FireBlastSpell spell;
     [System.NonSerialized]
     public bool isChanneling = false;
 
@@ -16,8 +15,12 @@ public class Player : MonoBehaviour {
 
 	public Text handText;
 	public Text deckText;
+	public Text cooldownText;
+
+	public Timer cooldownTimer;
 	// Use this for initialization
 	void Start () {
+		cooldownTimer = new Timer();
         deck = new Deck(new List<int>() { 1,1,1,2,2,2,3,3,3,3 });
 		deck.Shuffle();
 		hand = new Hand(deck);
@@ -52,8 +55,10 @@ public class Player : MonoBehaviour {
 			Debug.Log(deck.ToString());
         }
         if (inputKey != 0 && inputKey != 5) {  // When a spell key is being pressed.
-            if (!isChanneling) {  // Prevent player from casting again if player is channeling.
-				hand.Use(inputKey - 1, gameObject);
+			// Cast a spell if not channeling and not on cooldown.
+            if (!isChanneling && cooldownTimer.GetState()) {
+				Spell spellUsed = hand.Use(inputKey - 1, gameObject);
+				cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
 				hand.Draw();
             }
         } else {  // When no key is pressed.
@@ -67,9 +72,12 @@ public class Player : MonoBehaviour {
             moveToward(targetPosition, speed);
         }
 
+		cooldownTimer.Tick();
+
 		// Draw hand.
 		handText.text = hand.ToString();
 		deckText.text = deck.ToString();
+		cooldownText.text = cooldownTimer.GetTime().ToString();
 	}
     
     void lookAtMouse(){
@@ -94,6 +102,5 @@ public class Player : MonoBehaviour {
         else{
             transform.position = targetPosition;
         }
-        
     }
 }
