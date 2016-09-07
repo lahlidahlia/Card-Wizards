@@ -12,10 +12,10 @@ public class Deck{
     }
 
     public void Shuffle() {
-        /*
-         * Fisher-Yates shuffle.
-         * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
-         */
+		/*
+		 * Fisher-Yates shuffle.
+		 * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
+		 */
         for (int i = deck.Count-1; i > 0; i--) {
             int r = Random.Range(0, i+1);
 
@@ -26,7 +26,7 @@ public class Deck{
     }
 
     public int Draw() {
-        /* Removes the last number from the deck. */
+	   /* Removes the last number from the deck. */
 		int ret = deck[deck.Count - 1];
 		deck.RemoveAt(deck.Count - 1);
 		if (deck.Count == 0) {  // If out of cards, reshuffle cards from the discard pile.
@@ -44,7 +44,7 @@ public class Deck{
 	}
 
     public override string ToString() {
-	/* Returns a string that represents the cards in deck. */
+		/* Returns a string that represents the cards in deck. */
 		string ret = "";
         foreach(int i in deck) {
             ret += i.ToString() + ", ";

@@ -18,12 +18,17 @@ public class Player : MonoBehaviour {
 	public Text cooldownText;
 
 	public Timer cooldownTimer;
+
+	bool isCasting = false;
+	// Used for interrupting spells.
+	Coroutine currentlyCastingCoroutine;  // Coroutine that is casting the spell.
+	int currentlyCastingSlot;  // The hand index that is being casted.
 	// Use this for initialization
 	void Start () {
 		cooldownTimer = new Timer();
         deck = new Deck(new List<int>() { 1,1,1,2,2,2,3,3,3,3 });
 		deck.Shuffle();
-		hand = new Hand(deck);
+		hand = new Hand(deck, gameObject);
 		while (hand.Draw()) { }  // Draw until hand is full.
 	}
 	
@@ -34,7 +39,7 @@ public class Player : MonoBehaviour {
         float mouseY = Camera.main.ScreenToWorldPoint(Input.mousePosition).y;
 
         if (Input.GetMouseButton(0)) {  // Left click.
-            Debug.Log(deck.ToString());
+			Interrupt();
         }
         if (Input.GetMouseButton(1)) {  // Right click to move.
             targetPosition = new Vector2(mouseX, mouseY);
@@ -67,20 +72,18 @@ public class Player : MonoBehaviour {
 		}
         if (inputKey != -1) {  // When a spell key is being pressed.
 			// Cast a spell if not channeling and not on cooldown.
-            if (!isChanneling && cooldownTimer.GetState()) {
-				Spell spellUsed = hand.Use(inputKey - 1, gameObject);
-				cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
-				hand.Draw();
-            }
+            if (!isChanneling && cooldownTimer.GetState() && !isCasting) {
+				currentlyCastingSlot = inputKey - 1;
+				currentlyCastingCoroutine = StartCoroutine(CastSpell(inputKey - 1, hand.GetCard(inputKey - 1).castTime));  // Start the casting coroutine.
+			}
         } 
 		if(heldKey == -1){  // When no key is held.
             if (isChanneling == true) {  // When the player release key while channeling:
-				Debug.Log("UNCHANNELING!");
                 isChanneling = false;
             }
         }
 
-        if (!isChanneling) {
+        if (!isChanneling && !isCasting) {
             lookAtMouse();
             moveToward(targetPosition, speed);
         }
@@ -92,7 +95,28 @@ public class Player : MonoBehaviour {
 		deckText.text = deck.ToString();
 		cooldownText.text = cooldownTimer.GetTime().ToString();
 	}
-    
+
+	IEnumerator CastSpell(int index, float castTime) {
+		/* Coroutine that casts a spell at the given hand index with a delay. */
+		isCasting = true;
+		yield return new WaitForSeconds(castTime);
+		isCasting = false;
+		Spell spellUsed = hand.GetCard(index);
+		cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
+		hand.Use(index);
+		hand.Draw();
+	}
+
+	void Interrupt() {
+		/* Interrupts the currently casting spell. */
+		if (isCasting) {
+			StopCoroutine(currentlyCastingCoroutine);
+			hand.Discard(currentlyCastingSlot);
+			isCasting = false;
+			hand.Draw();
+		}
+	}
+
     void lookAtMouse(){
         // Get mouse coordinates.
         float mouseX = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;

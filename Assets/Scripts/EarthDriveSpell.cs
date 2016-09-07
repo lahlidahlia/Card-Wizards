@@ -3,7 +3,8 @@ using System.Collections;
 
 public class EarthDriveSpell : Spell {
     public override float cooldown { get { return 1; } }
-    public override bool isChannel { get { return true; } }
+	public override float castTime { get { return 1; } }
+	public override bool isChannel { get { return true; } }
 
     private float spawnDelay = 0.5f;  // Delay between each projectile spawn.
     private float distanceBetweenEachProjectile = 1;  // In world coordinate, distance between each projectile.

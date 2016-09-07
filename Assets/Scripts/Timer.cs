@@ -15,10 +15,10 @@ public class Timer{
 	}
 
 	public bool Tick() {
-	/*
-	 * Tick the timer down. Call this function in the update loop.
-	 * Returns true if the timer finished. Otherwise returns false.
-	 */
+		/*
+		 * Tick the timer down. Call this function in the update loop.
+		 * Returns true if the timer finished. Otherwise returns false.
+		 */
 		timer -= Time.deltaTime;
 		if (timer <= 0) {
 			timer = 0;
@@ -32,7 +32,7 @@ public class Timer{
 	}
 
 	public float GetTime() {
-	/* Get the remaining time on the timer. */
+		/* Get the remaining time on the timer. */
 		return timer;
 	}
 

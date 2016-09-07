@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class ConeOfColdSpell : Spell {
-    public override float cooldown { get { return 2; } }
+	public override float cooldown { get { return 2; } }
     public override bool isChannel { get { return true; } }
 
     public ConeOfColdSpell(GM gm) : base(gm) {
@@ -15,15 +15,14 @@ public class ConeOfColdSpell : Spell {
             Debug.Log("NOTHING HAPPENED");
             return;
         }
-
         GameObject projectile = Object.Instantiate(projectilePrefab, player.transform.position, player.transform.rotation) as GameObject;
         projectile.AddComponent<ConeOfColdProjectile>();
 
         Player playerScr = player.GetComponent<Player>();
         playerScr.isChanneling = true;
 
-        // Run the channeling effect.
-        gm.RunCoroutine(channel(playerScr, projectile));
+		// Run the channeling effect.
+		gm.RunCoroutine(channel(playerScr, projectile));
     }
 
     public IEnumerator channel(Player playerScr, GameObject projectile) {

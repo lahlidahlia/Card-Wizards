@@ -19,7 +19,7 @@ public class GM : MonoBehaviour {
 	}
 	
     public Coroutine RunCoroutine(IEnumerator coroutine) {
-        /* Because you can't run a coroutine from a non-monobehaviour script apparently*/
+		/* Because you can't run a coroutine from a non-monobehaviour script apparently*/
         return StartCoroutine(coroutine);
     }
 }
