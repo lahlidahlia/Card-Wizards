@@ -40,6 +40,7 @@ public class Deck{
     }
 
 	public void AddToDiscard(int card) {
+		/* Add a card to the discard pile for future use. */
 		discard.Add(card);
 	}
 

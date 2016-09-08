@@ -10,22 +10,26 @@ public class Player : MonoBehaviour {
     [System.NonSerialized]
     public bool isChanneling = false;
 
-    private Deck deck;
-	private Hand hand;
-
 	public Text handText;
 	public Text deckText;
 	public Text cooldownText;
 
-	public Timer cooldownTimer;
+	private Deck deck;
+	private Hand hand;
 
-	bool isCasting = false;
+	private Timer cooldownTimer;  // Timer used for cooldown after casting a spell.
+	private Timer drawTimer;  // Dictates when the player draws a card.
+
+	private float drawCooldown = 5;  // The delay between having an empty hand and drawing a card.
+
+	private bool isCasting = false;  // The reason casting doesn't have a timer is because it uses coroutine instead.
 	// Used for interrupting spells.
-	Coroutine currentlyCastingCoroutine;  // Coroutine that is casting the spell.
-	int currentlyCastingSlot;  // The hand index that is being casted.
-	// Use this for initialization
+	private Coroutine currentlyCastingCoroutine;  // Coroutine that is casting the spell.
+	private int currentlyCastingSlot;  // The hand index that is being casted.
+
 	void Start () {
 		cooldownTimer = new Timer();
+		drawTimer = new Timer();
         deck = new Deck(new List<int>() { 1,1,1,2,2,2,3,3,3,3 });
 		deck.Shuffle();
 		hand = new Hand(deck, gameObject);
@@ -45,9 +49,12 @@ public class Player : MonoBehaviour {
             targetPosition = new Vector2(mouseX, mouseY);
         }
 
-        // Each key correspond to each hand slot.
-        int inputKey = -1;  // -1 is no press.
+		// Key input detection.
+		// Each key correspond to each hand slot.
+		// -1 is no press.
+		int inputKey = -1;  
 		int heldKey = -1;  // Used for channeling purposes.
+
 		// The reason getkeydown is nested within getkey is so that key press and key hold is differentiated.
         if (Input.GetKey("1")) {
 			heldKey = 1;
@@ -70,14 +77,17 @@ public class Player : MonoBehaviour {
 				inputKey = 4;
 			}
 		}
-        if (inputKey != -1) {  // When a spell key is being pressed.
+
+        if (inputKey != -1) {  // When a spell key is being pressed (not held, to prevent repeat casting).
 			// Cast a spell if not channeling and not on cooldown.
-            if (!isChanneling && cooldownTimer.GetState() && !isCasting) {
+            if (!isChanneling && cooldownTimer.IsReady()
+					&& !isCasting
+					&& hand.GetCard(inputKey - 1) != null) {
 				currentlyCastingSlot = inputKey - 1;
 				currentlyCastingCoroutine = StartCoroutine(CastSpell(inputKey - 1, hand.GetCard(inputKey - 1).castTime));  // Start the casting coroutine.
 			}
         } 
-		if(heldKey == -1){  // When no key is held.
+		if(heldKey == -1){  // When no key is held (aka released).
             if (isChanneling == true) {  // When the player release key while channeling:
                 isChanneling = false;
             }
@@ -87,10 +97,15 @@ public class Player : MonoBehaviour {
             lookAtMouse();
             moveToward(targetPosition, speed);
         }
+		if (hand.GetFirstEmptySlot() != -1 && drawTimer.IsReady()) {  // Has a free slot and isn't in the process of drawing another one.
+			System.Action f = () => { hand.Draw(); };
+			drawTimer.Set(drawCooldown, f);  // That's a lambda. So that hand.Draw() doesn't return anything.
+		}
 
 		cooldownTimer.Tick();
+		drawTimer.Tick();
 
-		// Draw hand.
+		// Graphically draw.
 		handText.text = hand.ToString();
 		deckText.text = deck.ToString();
 		cooldownText.text = cooldownTimer.GetTime().ToString();
@@ -104,7 +119,6 @@ public class Player : MonoBehaviour {
 		Spell spellUsed = hand.GetCard(index);
 		cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
 		hand.Use(index);
-		hand.Draw();
 	}
 
 	void Interrupt() {
@@ -113,7 +127,6 @@ public class Player : MonoBehaviour {
 			StopCoroutine(currentlyCastingCoroutine);
 			hand.Discard(currentlyCastingSlot);
 			isCasting = false;
-			hand.Draw();
 		}
 	}
 

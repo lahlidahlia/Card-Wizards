@@ -6,8 +6,8 @@ public class EarthDriveSpell : Spell {
 	public override float castTime { get { return 1; } }
 	public override bool isChannel { get { return true; } }
 
-    private float spawnDelay = 0.5f;  // Delay between each projectile spawn.
-    private float distanceBetweenEachProjectile = 1;  // In world coordinate, distance between each projectile.
+    private float spawnDelay = 0.2f;  // Delay between each projectile spawn.
+    private float distanceBetweenEachProjectile = 0.8f;  // In world coordinate, distance between each projectile.
 
     public EarthDriveSpell(GM gm) : base(gm) {
         getAsset("EarthDriveSpell");  // Find the assets placed on this object.

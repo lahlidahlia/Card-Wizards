@@ -16,18 +16,26 @@ public class Hand {
 		}
     }
 
+	public int GetFirstEmptySlot() {
+		/* Returns the first empty slot if there is an empty hand slot, otherwise returns -1. */
+		for (int i = 0; i < hand.Length; i++) {
+			if (hand[i] == -1) {
+				return i;
+			}
+		}
+		return -1;
+	}
     public bool Draw() {
 		/*
 		 * Add a card to the hand.
 		 * Returns true if successful, false if otherwise, i.e. hand is full.
 		 */
-		for(int i = 0; i < hand.Length; i++) {
-			if(hand[i] == -1) {  // If empty.
-				hand[i] = deck.Draw();
-				return true;  // Success.
-			}
+		if (GetFirstEmptySlot() != -1) {
+			hand[GetFirstEmptySlot()] = deck.Draw();
+			return true;
+		} else {
+			return false;  // Hand is full.
 		}
-		return false;  // Hand is full.
     }
 
 	public void Discard(int index) {
@@ -38,17 +46,6 @@ public class Hand {
 		}
 	}
 
-	public void Use(int index) {
-		/* Use the card at the given index. Also discards the card.*/
-		int card = hand[index];
-		if (card == -1) {  // If the hand slot is empty.
-			return;
-		}
-		Discard(index);
-		GM.spellDictionary[card].effect(player);
-		
-	}
-
 	public Spell GetCard(int index) {
 		/* Returns the spell card at the given index.*/
 		int card = hand[index];
@@ -57,6 +54,12 @@ public class Hand {
 		}
 		return GM.spellDictionary[card];
 	}
+
+	public void Use(int index) {
+		/* Use the card at the given index. Also discards the card.*/
+		GetCard(index).effect(player);
+		Discard(index);
+	}	
 
 	public override string ToString() {
 		/* Returns a string that represents the cards in hand. */
