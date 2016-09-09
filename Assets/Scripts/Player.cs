@@ -3,6 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+public enum PlayerState {
+	FREE,
+	CAST,
+	EFFECT,
+	CHANNEL,
+	FINISH
+}
+
 public class Player : MonoBehaviour {
 
     public float speed;
@@ -20,12 +28,18 @@ public class Player : MonoBehaviour {
 	private Timer cooldownTimer;  // Timer used for cooldown after casting a spell.
 	private Timer drawTimer;  // Dictates when the player draws a card.
 
-	private float drawCooldown = 5;  // The delay between having an empty hand and drawing a card.
+	private float drawCooldown = 0;  // The delay between having an empty hand and drawing a card.
 
 	private bool isCasting = false;  // The reason casting doesn't have a timer is because it uses coroutine instead.
 	// Used for interrupting spells.
-	private Coroutine currentlyCastingCoroutine;  // Coroutine that is casting the spell.
-	private int currentlyCastingSlot;  // The hand index that is being casted.
+	public Coroutine castingCoroutine;  // Coroutine that is casting the spell.
+	private Spell castingSpell;
+	private int castingKey ;  // The hand index that is being casted.
+
+
+
+	public PlayerState currentState = PlayerState.FREE;
+	public PlayerState lastState;
 
 	void Start () {
 		cooldownTimer = new Timer();
@@ -78,26 +92,73 @@ public class Player : MonoBehaviour {
 			}
 		}
 
-        if (inputKey != -1) {  // When a spell key is being pressed (not held, to prevent repeat casting).
-			// Cast a spell if not channeling and not on cooldown.
-            if (!isChanneling && cooldownTimer.IsReady()
-					&& !isCasting
-					&& hand.GetCard(inputKey - 1) != null) {
-				currentlyCastingSlot = inputKey - 1;
-				currentlyCastingCoroutine = StartCoroutine(CastSpell(inputKey - 1, hand.GetCard(inputKey - 1).castTime));  // Start the casting coroutine.
-			}
-        } 
-		if(heldKey == -1){  // When no key is held (aka released).
-            if (isChanneling == true) {  // When the player release key while channeling:
-                isChanneling = false;
-            }
-        }
+		//if (lastState != currentState) {
+		//	Debug.Log(currentState);
+		//	lastState = currentState;
+		//}
 
-        if (!isChanneling && !isCasting) {
+		if (currentState == PlayerState.FREE && inputKey != -1 && cooldownTimer.IsDone()) {
+			Debug.Log("FREE");
+			castingKey = inputKey;
+			castingSpell = hand.GetSpell(castingKey - 1);
+			currentState = PlayerState.CAST;
+		}
+		if (currentState == PlayerState.CAST) {
+			if (castingCoroutine == null) {
+				castingCoroutine = StartCoroutine(Cast(castingSpell.castTime));
+			}
+			// State will be changed in the coroutine.
+		}
+		if (currentState == PlayerState.EFFECT) {
+			Debug.Log("EFFECT");
+			castingSpell.effect(gameObject);
+			currentState = PlayerState.CHANNEL;
+		}
+		if (currentState == PlayerState.CHANNEL) {
+			Debug.Log("CHANNEL");
+			if (castingSpell.channelTime == 0) {
+				currentState = PlayerState.FINISH;
+			}
+			// For channeled spells:
+			if (heldKey != castingKey) {
+				currentState = PlayerState.FINISH;
+			}
+		}
+		if (currentState == PlayerState.FINISH) {
+			Debug.Log("FINISH");
+			hand.Discard(castingKey - 1);
+			cooldownTimer.Set(castingSpell.cooldown);
+			castingKey = -1;
+			castingSpell = null;
+			castingCoroutine = null;
+			currentState = PlayerState.FREE;
+		}
+
+
+
+
+  //      if (inputKey != -1) {  // When a spell key is being pressed (not held, to prevent repeat casting).
+		//	// Cast a spell if not channeling and not on cooldown.
+  //          if (!isChanneling && cooldownTimer.IsDone()
+		//			&& !isCasting
+		//			&& hand.GetSpell(inputKey - 1) != null) {
+		//		currentlyCastingSlot = inputKey - 1;
+		//		currentlyCastingSpell = hand.GetSpell(inputKey - 1);
+		//		currentlyCastingCoroutine = StartCoroutine(CastSpell(inputKey - 1, hand.GetSpell(inputKey - 1).castTime));  // Start the casting coroutine.
+		//	}
+  //      } 
+		//if(heldKey == -1){  // When no key is held (aka released).
+  //          if (isChanneling == true) {  // When the player release key while channeling:
+  //              isChanneling = false;
+		//		cooldownTimer.Set(currentlyCastingSpell.cooldown);
+  //          }
+  //      }
+
+        if (currentState == PlayerState.FREE) {
             lookAtMouse();
             moveToward(targetPosition, speed);
         }
-		if (hand.GetFirstEmptySlot() != -1 && drawTimer.IsReady()) {  // Has a free slot and isn't in the process of drawing another one.
+		if (hand.GetFirstEmptySlot() != -1 && drawTimer.IsDone()) {  // if has a free slot and isn't in the process of drawing another one.
 			System.Action f = () => { hand.Draw(); };
 			drawTimer.Set(drawCooldown, f);  // That's a lambda. So that hand.Draw() doesn't return anything.
 		}
@@ -111,23 +172,28 @@ public class Player : MonoBehaviour {
 		cooldownText.text = cooldownTimer.GetTime().ToString();
 	}
 
-	IEnumerator CastSpell(int index, float castTime) {
-		/* Coroutine that casts a spell at the given hand index with a delay. */
-		isCasting = true;
+	//IEnumerator CastSpell(int index, float castTime) {
+	//	/* Coroutine that casts a spell at the given hand index with a delay. */
+	//	isCasting = true;
+	//	yield return new WaitForSeconds(castTime);
+	//	isCasting = false;
+	//	Spell spellUsed = hand.GetSpell(index);
+	//	cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
+	//	hand.Use(index);
+	//}
+
+	IEnumerator Cast(float castTime) {
+		Debug.Log("CASTING!!!");
 		yield return new WaitForSeconds(castTime);
-		isCasting = false;
-		Spell spellUsed = hand.GetCard(index);
-		cooldownTimer.Set(spellUsed.cooldown);  // Set player's cooldown.
-		hand.Use(index);
+		currentState = PlayerState.EFFECT;
+		Debug.Log("FINISH CASTING!!!");
 	}
 
 	void Interrupt() {
 		/* Interrupts the currently casting spell. */
-		if (isCasting) {
-			StopCoroutine(currentlyCastingCoroutine);
-			hand.Discard(currentlyCastingSlot);
-			isCasting = false;
-		}
+		if (currentState == PlayerState.FREE) { return; }
+		StopCoroutine(castingCoroutine);
+		currentState = PlayerState.FINISH;
 	}
 
     void lookAtMouse(){

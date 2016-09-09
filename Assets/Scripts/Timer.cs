@@ -49,7 +49,7 @@ public class Timer{
 		return timer;
 	}
 
-	public bool IsReady() {
+	public bool IsDone() {
 		/* Get the state of the timer, with true being done and false being still ticking. */
 		return timer <= 0;
 	}

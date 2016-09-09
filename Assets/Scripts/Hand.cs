@@ -40,13 +40,14 @@ public class Hand {
 
 	public void Discard(int index) {
 		/* Discard a card at the given index. */
+		Debug.Log(index);
 		if (hand[index] != -1) {  // If the hand slot isn't empty.
 			deck.AddToDiscard(hand[index]);  // Add to discard pile to be reshuffled.
 			hand[index] = -1;  // Remove the card from hand.
 		}
 	}
 
-	public Spell GetCard(int index) {
+	public Spell GetSpell(int index) {
 		/* Returns the spell card at the given index.*/
 		int card = hand[index];
 		if (card == -1) {  // If the hand slot is empty.
@@ -57,7 +58,7 @@ public class Hand {
 
 	public void Use(int index) {
 		/* Use the card at the given index. Also discards the card.*/
-		GetCard(index).effect(player);
+		GetSpell(index).effect(player);
 		Discard(index);
 	}	
 
