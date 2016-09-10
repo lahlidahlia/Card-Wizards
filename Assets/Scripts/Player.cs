@@ -21,18 +21,23 @@ public class Player : MonoBehaviour {
 	public Text handText;
 	public Text deckText;
 	public Text cooldownText;
+	public Text drawCooldownText;
+	public Text channelText;
+	public Text castText;
 
 	private Deck deck;
 	private Hand hand;
 
 	private Timer cooldownTimer;  // Timer used for cooldown after casting a spell.
 	private Timer drawTimer;  // Dictates when the player draws a card.
+	public Timer channelTimer;  // For UI purpose only.
+	private Timer castTimer;  // For UI purpose only.
 
-	private float drawCooldown = 0;  // The delay between having an empty hand and drawing a card.
+	private float drawCooldown = 1;  // The delay between having an empty hand and drawing a card.
 
 	private bool isCasting = false;  // The reason casting doesn't have a timer is because it uses coroutine instead.
 	// Used for interrupting spells.
-	public Coroutine castingCoroutine;  // Coroutine that is casting the spell.
+	public IEnumerator castingCoroutine;  // Coroutine that is casting the spell. Used in case player gets interrupted.
 	private Spell castingSpell;
 	private int castingKey ;  // The hand index that is being casted.
 
@@ -44,6 +49,8 @@ public class Player : MonoBehaviour {
 	void Start () {
 		cooldownTimer = new Timer();
 		drawTimer = new Timer();
+		channelTimer = new Timer();
+		castTimer = new Timer();
         deck = new Deck(new List<int>() { 1,1,1,2,2,2,3,3,3,3 });
 		deck.Shuffle();
 		hand = new Hand(deck, gameObject);
@@ -98,24 +105,24 @@ public class Player : MonoBehaviour {
 		//}
 
 		if (currentState == PlayerState.FREE && inputKey != -1 && cooldownTimer.IsDone()) {
-			Debug.Log("FREE");
+			// Store input and spell in a temp variable to be referenced throughout the process.
 			castingKey = inputKey;
 			castingSpell = hand.GetSpell(castingKey - 1);
 			currentState = PlayerState.CAST;
 		}
 		if (currentState == PlayerState.CAST) {
+			// Cast the 
 			if (castingCoroutine == null) {
-				castingCoroutine = StartCoroutine(Cast(castingSpell.castTime));
+				castingCoroutine = Cast(castingSpell.castTime);
+				StartCoroutine(castingCoroutine);
 			}
 			// State will be changed in the coroutine.
 		}
 		if (currentState == PlayerState.EFFECT) {
-			Debug.Log("EFFECT");
 			castingSpell.effect(gameObject);
 			currentState = PlayerState.CHANNEL;
 		}
 		if (currentState == PlayerState.CHANNEL) {
-			Debug.Log("CHANNEL");
 			if (castingSpell.channelTime == 0) {
 				currentState = PlayerState.FINISH;
 			}
@@ -125,13 +132,16 @@ public class Player : MonoBehaviour {
 			}
 		}
 		if (currentState == PlayerState.FINISH) {
-			Debug.Log("FINISH");
 			hand.Discard(castingKey - 1);
 			cooldownTimer.Set(castingSpell.cooldown);
 			castingKey = -1;
 			castingSpell = null;
 			castingCoroutine = null;
 			currentState = PlayerState.FREE;
+
+			// UI Only
+			castTimer.Set(0);
+			channelTimer.Set(0);
 		}
 
 
@@ -165,11 +175,15 @@ public class Player : MonoBehaviour {
 
 		cooldownTimer.Tick();
 		drawTimer.Tick();
+		castTimer.Tick();
 
 		// Graphically draw.
-		handText.text = hand.ToString();
-		deckText.text = deck.ToString();
-		cooldownText.text = cooldownTimer.GetTime().ToString();
+		handText.text = "Hand: " + hand.ToString();
+		deckText.text = "Deck: " + deck.ToString();
+		cooldownText.text = "Cooldown: " + cooldownTimer.GetTime().ToString();
+		channelText.text = "Channel: " + channelTimer.GetTime().ToString();
+		drawCooldownText.text = "Next Draw: " + drawTimer.GetTime().ToString();
+		castText.text = "Cast: " + castTimer.GetTime().ToString();
 	}
 
 	//IEnumerator CastSpell(int index, float castTime) {
@@ -184,6 +198,7 @@ public class Player : MonoBehaviour {
 
 	IEnumerator Cast(float castTime) {
 		Debug.Log("CASTING!!!");
+		castTimer.Set(castTime);
 		yield return new WaitForSeconds(castTime);
 		currentState = PlayerState.EFFECT;
 		Debug.Log("FINISH CASTING!!!");

@@ -44,11 +44,16 @@ public class Deck{
 		discard.Add(card);
 	}
 
-    public override string ToString() {
+	public Spell GetSpell(int index) {
+		/* Returns the spell card at the given index.*/
+		return GM.spellDictionary[deck[index]];
+	}
+
+	public override string ToString() {
 		/* Returns a string that represents the cards in deck. */
 		string ret = "";
         foreach(int i in deck) {
-            ret += i.ToString() + ", ";
+            ret += GM.spellDictionary[i].name + ", ";
         }
         return ret;
     }

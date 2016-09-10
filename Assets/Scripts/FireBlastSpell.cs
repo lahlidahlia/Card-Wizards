@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class FireBlastSpell : Spell {
-    public override float cooldown { get { return 0.5f; } }
+	public override string name { get { return "FB"; } }
+	public override float cooldown { get { return 0.5f; } }
 
     private float damage = 1;
     private float projectileSpeed = 500;

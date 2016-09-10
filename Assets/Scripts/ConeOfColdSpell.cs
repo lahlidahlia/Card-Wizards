@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class ConeOfColdSpell : Spell {
-	public override float cooldown { get { return 2; } }
+	public override string name { get { return "CC"; } }
+	public override float cooldown { get { return 0.5f; } }
     public override float channelTime { get { return 2; } }
 
     public ConeOfColdSpell(GM gm) : base(gm) {

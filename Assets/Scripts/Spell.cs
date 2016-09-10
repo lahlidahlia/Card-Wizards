@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public abstract class Spell{
+	public abstract string name { get; }
     public abstract float cooldown { get; }  // Time in seconds
 	public virtual float castTime { get { return 0; } }  // Time in seconds
 	public virtual float channelTime { get { return 0; } }  // How long can the spell be channeled for.
@@ -29,9 +30,11 @@ public abstract class Spell{
         }
     }
 
-	protected Coroutine channel(Player playerScr, GameObject projectile) {
+	protected IEnumerator channel(Player playerScr, GameObject projectile) {
 		/* Encapsulator function, returns the coroutine*/
-		return gm.RunCoroutine(_channel(playerScr, projectile));
+		IEnumerator ret = _channel(playerScr, projectile);
+		gm.RunCoroutine(ret);
+		return ret;
 	}
 	protected virtual IEnumerator _channel(Player playerScr, GameObject projectile) {
 		/* 
@@ -40,6 +43,7 @@ public abstract class Spell{
 		 *	Do not run this method, but run channel(...) instead.
 		 */
 		channelTimer.Set(channelTime);
+		playerScr.channelTimer = channelTimer;
 		playerScr.currentState = PlayerState.CHANNEL;
 		while (playerScr.currentState == PlayerState.CHANNEL && !channelTimer.IsDone()) {
 			channelTimer.Tick();

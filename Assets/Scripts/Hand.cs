@@ -66,7 +66,11 @@ public class Hand {
 		/* Returns a string that represents the cards in hand. */
 		string ret = "";
 		foreach (int i in hand) {
-			ret += i.ToString() + ", ";
+			if (i == -1) {
+				ret += "---, ";
+			} else {
+				ret += GM.spellDictionary[i].name + ", ";
+			}
 		}
 		return ret;
 	}
